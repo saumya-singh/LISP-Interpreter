@@ -5,20 +5,23 @@ def bracketParser(data):
         return (data[0], data[1 : ].strip())
 
 def numberParser(data):
-    matched_number = re.match('(?:\d+)(?:\.\d+)?\S+', data)
+    matched_number = re.match('(?:\d+)(?:\.\d+)?', data)
     if matched_number:
         try:
             return (int(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
         except:
-            return (float(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
+            try:
+                return (float(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
+            except:
+                return (data[ : matched_number.end()], data[matched_number.end() : ].strip())
 
 def wordParser(data):
-    matched_word = re.match('[?a-zA-Z_!]+\S+', data)
+    matched_word = re.match('[?a-zA-Z_!]+', data)
     if matched_word:
         return (data[ : matched_word.end()], data[matched_word.end() : ].strip())
 
 def operatorParser(data):
-    matched_operator = re.match('([+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))\S+', data)
+    matched_operator = re.match('(?:[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))', data)
     if matched_operator:
         return (data[ : matched_operator.end()], data[matched_operator.end() : ].strip())
 
@@ -34,6 +37,7 @@ def listExpressionParser(data):
             res = listExpressionParser(data)
             token = res[0]
             parsed_list.append(token)
+            print("list", parsed_list)
             data = res[1].strip()
 
         data = data[1 : ].strip()
@@ -56,7 +60,7 @@ def main():
     #    for line in file_obj:
     #        data += line.strip()
 
-    parsed_data = listExpressionParser('(begin (define 10 r) (* pi (* r r r)))')
+    parsed_data = listExpressionParser('(begin (definejk rec uhjn) (*cdd090++=== picd (*dcd rdcdc rdcd rdcdc)))')
     print(parsed_data)
     #result = evaluator(parsed_data)
 
