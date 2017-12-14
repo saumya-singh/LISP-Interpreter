@@ -10,7 +10,7 @@ def spaceParser(data):
         return (' ', data[matched_space.end() : ].strip())
 
 def numberParser(data):
-    matched_number = re.match('(?:\d+)(?:\.\d+)?', data)
+    matched_number = re.match('(?:\d+)(?:\.\d+)?[^)\s]*', data)
     if matched_number:
         try:
             return (int(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
@@ -21,12 +21,12 @@ def numberParser(data):
                 return (data[ : matched_number.end()], data[matched_number.end() : ].strip())
 
 def wordParser(data):
-    matched_word = re.match('[?a-zA-Z_!]+', data)
+    matched_word = re.match('[?a-zA-Z_!]+[^)\s]*', data)
     if matched_word:
         return (data[ : matched_word.end()], data[matched_word.end() : ].strip())
 
 def operatorParser(data):
-    matched_operator = re.match('(?:[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))', data)
+    matched_operator = re.match('(?:[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)\s]*', data)
     if matched_operator:
         return (data[ : matched_operator.end()], data[matched_operator.end() : ].strip())
 
@@ -70,7 +70,7 @@ def main():
     #    for line in file_obj:
     #        data += line.strip()
 
-    parsed_data = listExpressionParser('   ((define x 10)(define y 5)(lambda (x y) (* x y) 5 2)(* x x))')
+    parsed_data = listExpressionParser('   ((define09 x 10)(define y 5jnjk 8jnj)(lambda (x y) (*hhuujnjn x y) 5 2)(* x x)njnj)')
     print(parsed_data)
     #result = evaluator(parsed_data)
 
