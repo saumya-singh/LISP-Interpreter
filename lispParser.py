@@ -4,6 +4,11 @@ def bracketParser(data):
     if data[0] == '(':
         return (data[0], data[1 : ].strip())
 
+def spaceParser(data):
+    matched_space = re.match('\s+', data)
+    if matched_space:
+        return (' ', data[matched_space.end() : ].strip())
+
 def numberParser(data):
     matched_number = re.match('(?:\d+)(?:\.\d+)?', data)
     if matched_number:
@@ -26,9 +31,12 @@ def operatorParser(data):
         return (data[ : matched_operator.end()], data[matched_operator.end() : ].strip())
 
 def listExpressionParser(data):
-    result = parser(bracketParser, numberParser, wordParser, operatorParser, input_data = data)
+    result = parser(spaceParser, bracketParser, numberParser, wordParser, operatorParser, input_data = data)
     token = result[0]
     data = result[1].strip()
+
+    if token == ' ':
+        return listExpressionParser(data)
 
     if token == '(':
         parsed_list = []
@@ -36,8 +44,10 @@ def listExpressionParser(data):
         while data[0] != ')':
             res = listExpressionParser(data)
             token = res[0]
+            if token == ' ':
+                continue
             parsed_list.append(token)
-            print("list", parsed_list)
+            #print("list", parsed_list)
             data = res[1].strip()
 
         data = data[1 : ].strip()
@@ -60,7 +70,7 @@ def main():
     #    for line in file_obj:
     #        data += line.strip()
 
-    parsed_data = listExpressionParser('(begin (definejk rec uhjn) (*cdd090++=== picd (*dcd rdcdc rdcd rdcdc)))')
+    parsed_data = listExpressionParser('   ((define x 10)(define y 5)(lambda (x y) (* x y) 5 2)(* x x))')
     print(parsed_data)
     #result = evaluator(parsed_data)
 
