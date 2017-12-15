@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import re
 
 def bracketParser(data):
@@ -63,16 +65,14 @@ def parser(*args, input_data):
             return res
     return None
 
-def main():
+
+if __name__ == '__main__':
     #data = ''
     #file_name = input("enter the file name")
     #with open(file_name, 'r') as file_obj:
     #    for line in file_obj:
     #        data += line.strip()
 
-    parsed_data = listExpressionParser('   ((define09 x 10)(define y 5jnjk 8jnj)(lambda (x y) (*hhuujnjn x y) 5 2)(* x x)njnj)')
-    print(parsed_data)
+    parsed_data = listExpressionParser("(begin (define r 10) (* pi (* r r)))")
+    print(parsed_data[0])
     #result = evaluator(parsed_data)
-
-if __name__ == '__main__':
-    main()

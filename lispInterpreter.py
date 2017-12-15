@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 import math 
 import operator as op
+from sys import argv
 from functools import reduce
-#from lispParser import listExpressionParser
+from lispParser import listExpressionParser
 
 def standardEnv():
     env = {}
@@ -53,9 +56,17 @@ def eval(x, env ):
     elif isinstance(x, int) or isinstance(x, float):
         return x
 
+    elif x[0] == 'quote':
+        (_, exp) = x
+        return exp
+
+    elif x[0] == 'set!':
+        (_, symbol, exp) = x
+        if env.has_key(symbol):
+            env[symbol] = eval(exp, env)
+
     elif x[0] == 'if':
         (_, test, conseq, alt) = x
-
         if eval(test, env):
             return eval(conseq, env)
         else:
@@ -72,4 +83,9 @@ def eval(x, env ):
 
 
 if __name__ == '__main__':
-    print(eval(['begin', ['define', 'r', 10], ['*', 'pi', ['*', 'r', 'r']]], global_env))
+    #print(eval(['begin', ['define', 'r', 10], ['*', 'pi', ['*', 'r', 'r']]], global_env))
+    file_name = argv[1]
+    with open(file_name, 'r') as file_obj:
+        data = file_obj.read()
+    parsed_data = listExpressionParser(data)
+    print(eval(parsed_data[0], global_env))
