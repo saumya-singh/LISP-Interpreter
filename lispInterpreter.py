@@ -4,7 +4,7 @@ import math
 import operator as op
 from sys import argv
 from functools import reduce
-from lispParser import listExpressionParser
+from lispParser import entryExitFunction
 
 def standardEnv():
     env = {}
@@ -87,5 +87,9 @@ if __name__ == '__main__':
     file_name = argv[1]
     with open(file_name, 'r') as file_obj:
         data = file_obj.read()
-    parsed_data = listExpressionParser(data)
-    print(eval(parsed_data[0], global_env))
+        
+    parsed_data = entryExitFunction(data)
+    if isinstance(parsed_data, tuple):
+        print(eval(parsed_data[0], global_env))
+    else:
+        print(parsed_data)

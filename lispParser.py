@@ -4,75 +4,92 @@ import re
 
 def bracketParser(data):
     if data[0] == '(':
-        return (data[0], data[1 : ].strip())
+        return (data[0], data[1 : ])
 
 def spaceParser(data):
     matched_space = re.match('\s+', data)
     if matched_space:
-        return (' ', data[matched_space.end() : ].strip())
+        return (' ', data[matched_space.end() : ])
 
 def numberParser(data):
     matched_number = re.match('(?:\d+)(?:\.\d+)?[^)\s]*', data)
     if matched_number:
         try:
-            return (int(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
+            return (int(data[ : matched_number.end()]), data[matched_number.end() : ])
         except:
             try:
-                return (float(data[ : matched_number.end()]), data[matched_number.end() : ].strip())
+                return (float(data[ : matched_number.end()]), data[matched_number.end() : ])
             except:
-                return (data[ : matched_number.end()], data[matched_number.end() : ].strip())
+                return (data[ : matched_number.end()], data[matched_number.end() : ])
 
 def wordParser(data):
     matched_word = re.match('[?a-zA-Z_!]+[^)\s]*', data)
     if matched_word:
-        return (data[ : matched_word.end()], data[matched_word.end() : ].strip())
+        return (data[ : matched_word.end()], data[matched_word.end() : ])
 
 def operatorParser(data):
     matched_operator = re.match('(?:[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)\s]*', data)
     if matched_operator:
-        return (data[ : matched_operator.end()], data[matched_operator.end() : ].strip())
+        return (data[ : matched_operator.end()], data[matched_operator.end() : ])
 
 def listExpressionParser(data):
-    result = parser(spaceParser, bracketParser, numberParser, wordParser, operatorParser, input_data = data)
+    result = valueParser(data)
     token = result[0]
-    data = result[1].strip()
-
-    if token == ' ':
-        return listExpressionParser(data)
+    data = result[1]
 
     if token == '(':
         parsed_list = []
 
-        while data[0] != ')':
-            res = listExpressionParser(data)
-            token = res[0]
-            if token == ' ':
-                continue
-            parsed_list.append(token)
-            #print("list", parsed_list)
-            data = res[1].strip()
+        try:
+            while data[0] != ')':
+                res = listExpressionParser(data)
+                token = res[0]
+                data = res[1]
+                if token == ' ':
+                    continue
+                parsed_list.append(token)
 
-        data = data[1 : ].strip()
-        return (parsed_list, data.strip())
+            data = data[1 : ]
+            return (parsed_list, data)
+        except:
+            return "Incorect Syntax: ')' outer parenthesis missing"
 
     else:
-        return (token, data.strip())
+        return (token, data)
 
-def parser(*args, input_data):
-    for one_parser in args:
-        res = one_parser(input_data)
-        if res:
-            return res
-    return None
 
+def entryExitFunction(data):
+    if len(data) == 0:
+        return "No Data"
+
+    result = spaceParser(data)
+    if result:
+        data = result[1]
+    result = listExpressionParser(data)
+    
+    if isinstance(result, tuple) and result[1] != '':
+        res = spaceParser(result[1])
+        if res and res[1] != '':
+            return "not a valid syntax"
+        return (result[0], res[1])
+    return result
+
+def parser(*args):
+    def parserData(data):
+        for one_parser in args:
+            res = one_parser(data)
+            if res:
+                return res
+    return parserData
+
+valueParser = parser(spaceParser, bracketParser, numberParser, wordParser, operatorParser)
 
 if __name__ == '__main__':
-    #data = ''
-    #file_name = input("enter the file name")
-    #with open(file_name, 'r') as file_obj:
-    #    for line in file_obj:
-    #        data += line.strip()
+    
+    file_name = input("enter the file name: ")
+    with open(file_name, 'r') as file_obj:
+        data = file_obj.read()
 
-    parsed_data = listExpressionParser("(begin (define r 10) (* pi (* r r)))")
-    print(parsed_data[0])
-    #result = evaluator(parsed_data)
+    parsed_data = entryExitFunction(data)
+    print(parsed_data)
+    #'(begin (define r 10) (* pi (* r r)))'
