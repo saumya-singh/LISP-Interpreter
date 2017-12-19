@@ -22,15 +22,10 @@ def numberParser(data):
             except:
                 return (data[ : matched_number.end()], data[matched_number.end() : ])
 
-def wordParser(data):
-    matched_word = re.match('[?a-zA-Z_!]+[^)\s]*', data)
-    if matched_word:
-        return (data[ : matched_word.end()], data[matched_word.end() : ])
-
-def operatorParser(data):
-    matched_operator = re.match('(?:[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)\s]*', data)
-    if matched_operator:
-        return (data[ : matched_operator.end()], data[matched_operator.end() : ])
+def symbolParser(data):
+    matched_symbol = re.match('(?:[?a-zA-Z_!]+|[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)\s]*', data)
+    if matched_symbol:
+        return (data[ : matched_symbol.end()], data[matched_symbol.end() : ])
 
 def listExpressionParser(data):
     result = valueParser(data)
@@ -82,7 +77,7 @@ def parser(*args):
                 return res
     return parserData
 
-valueParser = parser(spaceParser, bracketParser, numberParser, wordParser, operatorParser)
+valueParser = parser(spaceParser, bracketParser, numberParser, symbolParser)
 
 if __name__ == '__main__':
     
