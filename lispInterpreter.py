@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import math 
 import operator as op
 from sys import argv
@@ -56,37 +57,52 @@ def eval(x, env):
     elif not isinstance(x, list):
         return x
 
-    elif x[0] == 'quote':
-        (_, exp) = x
-        return exp
-
     elif x[0] == 'set!':
-        (_, symbol, exp) = x
-        if env.has_key(symbol):
-            env[symbol] = eval(exp, env)
+        try:
+            (_, symbol, exp) = x
+            if symbol in env.keys():
+                env[symbol] = eval(exp, env)
+        except:
+            print("not a valid syntax: 'set!' does not have valid number of arguments")
+            os._exit(1)
 
     elif x[0] == 'if':
-        (_, test, conseq, alt) = x
-        if eval(test, env):
-            return eval(conseq, env)
-        else:
-            return eval(alt, env)
+        try:
+            (_, test, conseq, alt) = x
+            if eval(test, env):
+                return eval(conseq, env)
+            else:
+                return eval(alt, env)
+        except:
+            print("not a valid syntax: 'if' does not have valid number of arguments")
+            os._exit(1)
 
     elif x[0] == 'define':
-        (_, symbol, value) = x
-        env[symbol] = eval(value, env)
+        try:
+            (_, symbol, value) = x
+            env[symbol] = eval(value, env)
+        except:
+            print("not a valid syntax: 'define' does not have valid number of arguments")
+            os._exit(1)
 
     elif x[0] == 'lambda':
-        (_, params, body) = x
-        return procedure(params, body, env)
+        try:
+            (_, params, body) = x
+            return procedure(params, body, env)
+        except:
+            print("not a valid syntax: 'lambda' does not have valid number of arguments")
+            os._exit(1)
 
     else:
-        proc = env[x[0]]
-        args = [eval(exp, env) for exp in x[1 : ]]
-        return proc(*args)
+        try:
+            proc = env[x[0]]
+            args = [eval(exp, env) for exp in x[1 : ]]
+            return proc(*args)
+        except:
+            print("not a valid syntax")
+            os._exit(1)
 
 def procedure(parameters, body, env):
-
     def callFunction(*args):
         arg_list = [i for i in args]
         return eval(body, localEnv(parameters, arg_list, env))
@@ -97,19 +113,15 @@ collective_env = {}
 def localEnv(parameters, arg_list, env):
     if len(parameters) != len(arg_list):
         print("number of arguments not equal to the number of parameters")
-        #exit()
-
+        os._exit(1)
     local_env = {}
     local_var = zip(parameters, arg_list)
     for var_value_pair in local_var:
         local_env[var_value_pair[0]] = var_value_pair[1]
-
     collective_env.update(local_env)
     collective_env.update(env)
-
     return collective_env
     
-
 def main():
     #ans = eval(['begin', ['define', 'circle-area', ['lambda', ['r'], ['*', 'pi', ['*', 'r', 'r']]]], ['circle-area', ['+', 5, 95]]], global_env)
     #print(ans)
