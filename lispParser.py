@@ -64,9 +64,9 @@ def entryExitFunction(data):
     
     if isinstance(result, tuple) and result[1] != '':
         res = spaceParser(result[1])
-        if res and res[1] != '':
-            return "not a valid syntax"
-        return (result[0], res[1])
+        if res and res[1] == '':
+            return (result[0], res[1])
+        return "not a valid syntax"
     return result
 
 def parser(*args):
@@ -80,11 +80,9 @@ def parser(*args):
 valueParser = parser(spaceParser, bracketParser, numberParser, symbolParser)
 
 if __name__ == '__main__':
-    
-    file_name = input("enter the file name: ")
+    '''file_name = input("enter the file name: ")
     with open(file_name, 'r') as file_obj:
-        data = file_obj.read()
-
-    parsed_data = entryExitFunction(data)
-    print(parsed_data)
+        data = file_obj.read()'''
+    parsed_data = entryExitFunction('((define circle-area (lambda (r) (* pi (* r r))))(circle-area (+ 5 5)))')
+    print(parsed_data[0])
     #'(begin (define r 10) (* pi (* r r)))'
