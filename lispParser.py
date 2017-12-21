@@ -42,9 +42,6 @@ def listExpressionParser(data):
                 res = listExpressionParser(data)
                 token = res[0]
                 data = res[1]
-                if token == 'quote':
-                    parsed_list.append(token)
-                    return quoteString(parsed_list, data)
                 if token == ' ':
                     continue
                 parsed_list.append(token)
@@ -55,30 +52,14 @@ def listExpressionParser(data):
     else:
         return (token, data)
 
-def quoteString(parsed_list, data):
-    quote_string = ""
-    counter = 0
-    no_of_braces = 1
-    while no_of_braces != 0:
-        if data[counter] == '(':
-            no_of_braces += 1
-        elif data[counter] == ')':
-            no_of_braces -= 1
-        quote_string += data[counter]
-        counter += 1
-    quote_string = quote_string[ : -1].strip()
-    if quote_string == '':
-        print('Invalid quote')
-        os._exit(1)
-    parsed_list.append(quote_string)
-    return (parsed_list, data[counter : ])
-
 def entryExitFunction(data):
     if len(data) == 0:
         return "No Data"
     result = spaceParser(data)
     if result:
         data = result[1]
+    if data[0] != '(':
+        return "Unbounded symbol"
     result = listExpressionParser(data)
     if isinstance(result, tuple) and result[1] != '':
         res = spaceParser(result[1])
