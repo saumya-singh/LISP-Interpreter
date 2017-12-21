@@ -23,7 +23,8 @@ def standardEnv():
         'apply':   lambda proc, args: proc(*args),
         'begin':   lambda *x: x[-1],
         'car':     lambda x: x[0],
-        'cdr':     lambda x: x[1:],  
+        'cdr':     lambda x: x[1:], 
+        'print':   print, 
         'expt':    pow,
         'length':  len, 
         'map':     map,
@@ -52,7 +53,7 @@ def eval(x, env):
     elif x[0] == 'quote':
         try:
             (_, exp) = x
-            return exp
+            return quoteString(exp)
         except:
             print("not a valid syntax: 'quote' does not have valid number of arguments")
             os._exit(1)
@@ -101,6 +102,12 @@ def eval(x, env):
         except:
             print("not a valid syntax")
             os._exit(1)
+
+def quoteString(exp):
+    if isinstance(exp, list):
+        return '(' + ' '.join(map(quoteString, exp)) + ')' 
+    else:
+        return str(exp)
 
 def procedure(parameters, body, env):
     def callFunction(*args):
