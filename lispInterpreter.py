@@ -20,25 +20,17 @@ def standardEnv():
         '<=':      op.le, 
         '=':       op.eq,
         'abs':     abs,
-        'append':  op.add,
         'apply':   lambda proc, args: proc(*args),
         'begin':   lambda *x: x[-1],
         'car':     lambda x: x[0],
-        'cdr':     lambda x: x[1:], 
-        'cons':    lambda x,y: [x] + y,
-        'eq?':     op.is_, 
+        'cdr':     lambda x: x[1:],  
         'expt':    pow,
-        'equal?':  op.eq, 
         'length':  len, 
-        'list':    lambda *x: List(x), 
-        'list?':   lambda x: isinstance(x, List), 
         'map':     map,
         'max':     max,
         'min':     min,
-        'not':     op.not_,
         'null?':   lambda x: x == [], 
         'number?': lambda x: isinstance(x, int) or isinstance(x, float),  
-        'print':   print,
         'procedure?': callable,
         'round':   round,
         'remainder':  op.mod,
@@ -56,6 +48,14 @@ def eval(x, env):
 
     elif not isinstance(x, list):
         return x
+
+    elif x[0] == 'quote':
+        try:
+            (_, exp) = x
+            return exp
+        except:
+            print("not a valid syntax: 'quote' does not have valid number of arguments")
+            os._exit(1)
 
     elif x[0] == 'set!':
         try:
@@ -125,7 +125,6 @@ def localEnv(parameters, arg_list, env):
 def main():
     #ans = eval(['begin', ['define', 'circle-area', ['lambda', ['r'], ['*', 'pi', ['*', 'r', 'r']]]], ['circle-area', ['+', 5, 95]]], global_env)
     #print(ans)
-
     file_name = argv[1]
     with open(file_name, 'r') as file_obj:
         data = file_obj.read()
