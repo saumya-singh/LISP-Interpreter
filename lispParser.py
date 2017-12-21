@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-
-import re
+import re, os
 
 def bracketParser(data):
     if data[0] == '(':
@@ -10,6 +9,11 @@ def spaceParser(data):
     matched_space = re.match('\s+', data)
     if matched_space:
         return (' ', data[matched_space.end() : ])
+
+def stringParser(data):
+    matched_string = re.match('"[^"]*"', data)
+    if matched_string:
+        return (data[ : matched_string.end()], data[matched_string.end() : ])
 
 def numberParser(data):
     matched_number = re.match('(?:\d+)(?:\.\d+)?[^)\s]*', data)
@@ -31,37 +35,51 @@ def listExpressionParser(data):
     result = valueParser(data)
     token = result[0]
     data = result[1]
-
     if token == '(':
         parsed_list = []
-
         try:
             while data[0] != ')':
                 res = listExpressionParser(data)
                 token = res[0]
                 data = res[1]
+                if token == 'quote':
+                    parsed_list.append(token)
+                    return quoteString(parsed_list, data)
                 if token == ' ':
                     continue
                 parsed_list.append(token)
-
             data = data[1 : ]
             return (parsed_list, data)
         except:
             return "Incorect Syntax: ')' outer parenthesis missing"
-
     else:
         return (token, data)
 
+def quoteString(parsed_list, data):
+    quote_string = ""
+    counter = 0
+    no_of_braces = 1
+    while no_of_braces != 0:
+        if data[counter] == '(':
+            no_of_braces += 1
+        elif data[counter] == ')':
+            no_of_braces -= 1
+        quote_string += data[counter]
+        counter += 1
+    quote_string = quote_string[ : -1].strip()
+    if quote_string == '':
+        print('Invalid quote')
+        os._exit(1)
+    parsed_list.append(quote_string)
+    return (parsed_list, data[counter : ])
 
 def entryExitFunction(data):
     if len(data) == 0:
         return "No Data"
-
     result = spaceParser(data)
     if result:
         data = result[1]
     result = listExpressionParser(data)
-    
     if isinstance(result, tuple) and result[1] != '':
         res = spaceParser(result[1])
         if res and res[1] == '':
@@ -77,7 +95,7 @@ def parser(*args):
                 return res
     return parserData
 
-valueParser = parser(spaceParser, bracketParser, numberParser, symbolParser)
+valueParser = parser(spaceParser, stringParser, bracketParser, numberParser, symbolParser)
 
 if __name__ == '__main__':
     '''file_name = input("enter the file name: ")
