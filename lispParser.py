@@ -16,7 +16,7 @@ def stringParser(data):
         return (data[ : matched_string.end()], data[matched_string.end() : ])
 
 def numberParser(data):
-    matched_number = re.match('(?:\d+)(?:\.\d+)?[^)\s]*', data)
+    matched_number = re.match('(?:\d+)(?:\.\d+)?[^)(\s]*', data)
     if matched_number:
         try:
             return (int(data[ : matched_number.end()]), data[matched_number.end() : ])
@@ -27,7 +27,7 @@ def numberParser(data):
                 return (data[ : matched_number.end()], data[matched_number.end() : ])
 
 def symbolParser(data):
-    matched_symbol = re.match('(?:[?a-zA-Z_!]+|[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)\s]*', data)
+    matched_symbol = re.match('(?:[?a-zA-Z_!]+|[+]|[-]|[*]|[/]|(<=)|(>=)|(>)|(<)|(=))[^)(\s]*', data)
     if matched_symbol:
         return (data[ : matched_symbol.end()], data[matched_symbol.end() : ])
 
